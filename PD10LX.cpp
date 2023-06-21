@@ -24,20 +24,21 @@ PD10LX::PD10LX(uint8_t slave_address)
 /**
   * @brief Initializes the members of the PD10LX object getting calibration date, specifications and active channels.
 */
-void PD10LX::init() 
+bool PD10LX::init() 
 {
-  this->sensorCalibration();        // Get calibration date
-  this->sensorInformation();        // Get the sensor specifications
-  this->sensorActiveChannels();     // Get the actives channels 
+  bool err1 = this->sensorCalibration();        // Get calibration date
+  bool err2 = this->sensorInformation();        // Get the sensor specifications
+  bool err3 = this->sensorActiveChannels();     // Get the actives channels 
 
-  this->flag_init = true;           // Set flag_init to true to indicate that initialization is complete                                    
+  this->flag_init = err1 && err2 && err3;       // Set flag_init to true to indicate that initialization is complete      
+  return this->flag_init;                              
 }
 
 
 /**
  * @brief Get information about calibration date.
  */
-void PD10LX::sensorCalibration()
+bool PD10LX::sensorCalibration()
 {
   Wire.beginTransmission(this->slave_address);                    // Start the transmission with the slave address in writing mode
   Wire.write(BLOCK3_LDR);                                         // Write the ackBlockByteAmt value to the slave (Byte Amount (7...3) Block Nr (2...0))
@@ -45,9 +46,8 @@ void PD10LX::sensorCalibration()
   uint8_t buffer[2] = {BLOCK3_LDR, CALIBRATION_ADR};
   this->CRC = this->Crc8(buffer, 2);                              // Calculate the CRC value for the buffer
   Wire.write(this->CRC);                                          // Write the CRC value to the slave
-  byte err = Wire.endTransmission();  
-  Serial.println(err);                                            // End the transmission and check for any errors
-  while(err) {Serial.println("I2C communication error.");}
+  byte err = Wire.endTransmission();                              // End the transmission and check for any errors
+  if(err != 0) return 0;                                          
   
   delay(9);
  
@@ -62,13 +62,15 @@ void PD10LX::sensorCalibration()
     this->calibration_month = Wire.read();                                                  // Read the calibration month from the slave
     this->calibration_year = int((uint16_t(Wire.read()) << 8) | uint16_t(Wire.read()));     // Read the calibration year from the slave
   }
+
+  return 1;
 }
 
 
 /**
  * @brief Retrieves sensor information.
  */
-void PD10LX::sensorInformation()
+bool PD10LX::sensorInformation()
 {
   // Sending data to the slave
   Wire.beginTransmission(this->slave_address);                  // Start the transmission with the slave address in writing mode
@@ -78,7 +80,7 @@ void PD10LX::sensorInformation()
   this->CRC = this->Crc8(buffer, 2);                            // Calculate the CRC value for the buffer
   Wire.write(this->CRC);                                        // Write the CRC value to the slave
   byte err = Wire.endTransmission();                            // End the transmission and check for any errors
-  while(err) {Serial.println("I2C communication error.");}
+  if(err != 0) return 0;  
   
   delay(9);
  
@@ -93,13 +95,15 @@ void PD10LX::sensorInformation()
     this->P_min = ieee754_converter((uint32_t(Wire.read()) << 24) | (uint32_t(Wire.read()) << 16) | (uint32_t(Wire.read()) << 8) | uint32_t(Wire.read())); // Get the first 16 bits
     this->P_max = ieee754_converter((uint32_t(Wire.read()) << 24) | (uint32_t(Wire.read()) << 16) | (uint32_t(Wire.read()) << 8) | uint32_t(Wire.read())); // Get the last 16 bits
   }
+
+  return 1;
 }
 
 
 /**
  * @brief Get active sensor channels.
  */
-void PD10LX::sensorActiveChannels() 
+bool PD10LX::sensorActiveChannels() 
 {
   // Sending data to the slave
   Wire.beginTransmission(this->slave_address);                      // Start the transmission with the slave address in writing mode
@@ -109,7 +113,7 @@ void PD10LX::sensorActiveChannels()
   this->CRC = this->Crc8(buffer, 2);                                // Calculate the CRC value for the buffer
   Wire.write(this->CRC);                                            // Write the CRC value to the slave
   byte err = Wire.endTransmission();                                // End the transmission and check for any errors
-  while(err) {Serial.println("I2C communication error.");}
+  if(err != 0) return 0;  
   
   delay(9);
  
@@ -121,6 +125,8 @@ void PD10LX::sensorActiveChannels()
     Wire.read(); Wire.read();
     this->channels = Wire.read(); // Read the active sensor channels from the slave
   }
+
+  return 1;
 }
 
 

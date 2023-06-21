@@ -13,22 +13,22 @@ class PD10LX
     /** 
     * Initializes the registers of the PD10LX sensor
     */
-    void init();
+    bool init();
 
     /** 
     * Get the calibration date of the PD10LX sensor
     */
-    void sensorCalibration();
+    bool sensorCalibration();
 
     /** 
     * Get the information values of the PD10LX sensor
     */
-    void sensorInformation();
+    bool sensorInformation();
 
     /** 
     * Check the information about active channels of the PD10LX sensor
     */
-    void sensorActiveChannels();
+    bool sensorActiveChannels();
 
     /**
     * Reads the onboard memory map to determine temperature and pressure
