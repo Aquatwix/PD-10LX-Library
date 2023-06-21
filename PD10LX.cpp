@@ -15,9 +15,8 @@
  * @brief Constructor of the PD10LX class.
  * @param slave_address The address of the slave.
  */
-PD10LX::PD10LX(uint8_t slave_address) 
+PD10LX::PD10LX() 
 {
-	this->slave_address = slave_address; // Initialize the member variable slave_address with the passed argument value
 }
 
 
@@ -26,6 +25,7 @@ PD10LX::PD10LX(uint8_t slave_address)
 */
 bool PD10LX::init() 
 {
+  this->slave_address = 0x40;                   // The slave_address of the sensor is 0x40
   bool err1 = this->sensorCalibration();        // Get calibration date
   bool err2 = this->sensorInformation();        // Get the sensor specifications
   bool err3 = this->sensorActiveChannels();     // Get the actives channels 

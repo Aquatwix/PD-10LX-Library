@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "PD10LX.h"
 
-PD10LX Sensor(0x40);
+PD10LX Sensor;
 
 void setup() 
 {

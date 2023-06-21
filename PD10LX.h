@@ -8,7 +8,7 @@ class PD10LX
   public:
 
     // Constructor for PD10LX class, takes the slave address as a parameter
-    PD10LX(uint8_t slave_address);
+    PD10LX();
 
     /** 
     * Initializes the registers of the PD10LX sensor
