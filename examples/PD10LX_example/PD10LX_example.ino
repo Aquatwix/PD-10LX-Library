@@ -1,3 +1,10 @@
+/***************************************************************
+PD-10LX Library - Arduino Library for PD-10LX Sensor
+Version: 1.0.2
+Created by Aquatwix on May 8, 2023
+GitHub Repository: https://github.com/Aquatwix/PD-10LX-Library
+***************************************************************/
+
 #include <Wire.h>
 #include "PD10LX.h"
 
